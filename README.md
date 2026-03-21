@@ -20,4 +20,3 @@ pip install -r requirements.txt
 - Football Data UK: https://football-data.co.uk/
 - FBref: https://fbref.com/en/
 - FiveThirtyEight SPI: https://github.com/fivethirtyeight/data/tree/master/soccer-spi
-- Tidy Tuesday 2023: https://github.com/rfordatascience/tidytuesday/blob/main/data/2023/2023-04-04/readme.md
