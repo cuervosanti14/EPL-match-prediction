@@ -19,4 +19,4 @@ pip install -r requirements.txt
 ## Data Sources
 - Football Data UK: https://football-data.co.uk/
 - FBref: https://fbref.com/en/
-- FiveThirtyEight SPI: https://github.com/fivethirtyeight/data/tree/master/soccer-spi
+- Kaggle SPI: https://www.kaggle.com/datasets/thedevastator/club-soccer-predictions-spi-ratings-and-forecast?select=spi_global_rankings.csv 
