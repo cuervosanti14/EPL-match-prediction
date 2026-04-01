@@ -196,14 +196,14 @@ knn_final.fit(X_train, y_train)
 test_pred = knn_final.predict(X_test)
 
 # Test accuracy
-test_accuracy = accuracy_score(y_test, test_pred)
-test_f1 = f1_score(y_test, test_pred, average="weighted")
-test_precision = precision_score(y_test, test_pred, average="weighted", zero_division=0)
-test_recall = recall_score(y_test, test_pred, average="weighted")
-print(f"Test Accuracy: {test_accuracy:.4f}")
-print(f"Test Precision: {test_precision:.4f}")
-print(f"Test Recall: {test_recall:.4f}")
-print(f"Test F1 Score: {test_f1:.4f}")
+knn_accuracy = accuracy_score(y_test, test_pred)
+knn_f1 = f1_score(y_test, test_pred, average="weighted")
+knn_precision = precision_score(y_test, test_pred, average="weighted", zero_division=0)
+knn_recall = recall_score(y_test, test_pred, average="weighted")
+print(f"KNN Test Accuracy: {knn_accuracy:.4f}")
+print(f"KNN Test Precision: {knn_precision:.4f}")
+print(f"KNN Test Recall: {knn_recall:.4f}")
+print(f"KNN Test F1 Score: {knn_f1:.4f}")
 
 # Confusion matrix
 cm = confusion_matrix(y_test, test_pred, labels=["team1_win", "team2_win", "draw"])
@@ -225,14 +225,14 @@ lr_model.fit(X_train, y_train)
 
 # Evaluate on test set
 test_pred_lr = lr_model.predict(X_test)
-test_acc = accuracy_score(y_test, test_pred_lr)
-test_precision = precision_score(y_test, test_pred_lr, average="weighted", zero_division=0)
-test_recall = recall_score(y_test, test_pred_lr, average="weighted")
-test_f1 = f1_score(y_test, test_pred_lr, average="weighted")
-print(f"\nTest Accuracy: {test_acc:.4f}")
-print(f"Test Precision: {test_precision:.4f}")
-print(f"Test Recall: {test_recall:.4f}")
-print(f"Test F1 Score: {test_f1:.4f}")
+lr_accuracy = accuracy_score(y_test, test_pred_lr)
+lr_precision = precision_score(y_test, test_pred_lr, average="weighted", zero_division=0)
+lr_recall = recall_score(y_test, test_pred_lr, average="weighted")
+lr_f1 = f1_score(y_test, test_pred_lr, average="weighted")
+print(f"\nLR Test Accuracy: {lr_accuracy:.4f}")
+print(f"LR Test Precision: {lr_precision:.4f}")
+print(f"LR Test Recall: {lr_recall:.4f}")
+print(f"LR Test F1 Score: {lr_f1:.4f}")
 
 # Confusion matrix
 cm_lr = confusion_matrix(y_test, test_pred_lr, labels=["team1_win", "team2_win", "draw"])
@@ -243,3 +243,36 @@ plt.title("Logistic Regression Confusion Matrix (Test Set)")
 plt.tight_layout()
 plt.savefig("visuals/lr_confusion_matrix.png")
 plt.close()
+
+# ============================================================
+# 7. FIVETHIRTYEIGHT MODEL COMPARISON
+# ============================================================
+
+# Convert SPI dataset's probabilities into predicted outcomes
+# by taking whichever probability is highest for each match
+df["SPI_dataset_prediction"] = df[["prob1", "prob2", "probtie"]].idxmax(axis=1).map({
+    "prob1": "team1_win",
+    "prob2": "team2_win",
+    "probtie": "draw"
+})
+
+# Evaluate SPI predictions against actual results
+spi_dataset_acc = accuracy_score(df["actual_result"], df["SPI_dataset_prediction"])
+spi_dataset_precision = precision_score(df["actual_result"], df["SPI_dataset_prediction"], average="weighted", zero_division=0)
+spi_dataset_recall = recall_score(df["actual_result"], df["SPI_dataset_prediction"], average="weighted")
+spi_dataset_f1 = f1_score(df["actual_result"], df["SPI_dataset_prediction"], average="weighted")
+
+print(f"\nSPI Dataset Accuracy: {spi_dataset_acc:.4f}")
+print(f"SPI Dataset Precision: {spi_dataset_precision:.4f}")
+print(f"SPI Dataset Recall: {spi_dataset_recall:.4f}")
+print(f"SPI Dataset F1 Score: {spi_dataset_f1:.4f}")
+
+# Summary comparison table
+print("\n--- Model Comparison ---")
+print(f"{'Model':<25} {'Accuracy':>10} {'Precision':>10} {'Recall':>10} {'F1':>10}")
+print("-" * 65)
+print(f"{'Random Baseline':<25} {'0.3333':>10} {'-':>10} {'-':>10} {'-':>10}")
+print(f"{'Naive Baseline':<25} {'0.4501':>10} {'-':>10} {'-':>10} {'-':>10}")
+print(f"{'KNN (K=20)':<25} {knn_accuracy:>10.4f} {knn_precision:>10.4f} {knn_recall:>10.4f} {knn_f1:>10.4f}")
+print(f"{'Logistic Regression':<25} {lr_accuracy:>10.4f} {lr_precision:>10.4f} {lr_recall:>10.4f} {lr_f1:>10.4f}")
+print(f"{'SPI':<25} {spi_dataset_acc:>10.4f} {spi_dataset_precision:>10.4f} {spi_dataset_recall:>10.4f} {spi_dataset_f1:>10.4f}")
