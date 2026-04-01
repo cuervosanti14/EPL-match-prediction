@@ -4,7 +4,8 @@ from matplotlib.patches import Patch
 from sklearn.preprocessing import StandardScaler
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import confusion_matrix, accuracy_score, ConfusionMatrixDisplay
+from sklearn.metrics import confusion_matrix, accuracy_score, f1_score, precision_score, recall_score, ConfusionMatrixDisplay
+from sklearn.linear_model import LogisticRegression
 
 # ============================================================
 # 1. LOAD & CLEAN DATA
@@ -186,7 +187,7 @@ plt.savefig("visuals/knn_validation_accuracy.png")
 plt.close()
 
 best_k = k_values[val_accuracies.index(max(val_accuracies))]
-print("Best K:", best_k)
+print("\nBest K:", best_k)
 print("Best Validation Accuracy:", max(val_accuracies))
 
 # --- Final model: train with best K and evaluate on test set ---
@@ -196,7 +197,13 @@ test_pred = knn_final.predict(X_test)
 
 # Test accuracy
 test_accuracy = accuracy_score(y_test, test_pred)
+test_f1 = f1_score(y_test, test_pred, average="weighted")
+test_precision = precision_score(y_test, test_pred, average="weighted", zero_division=0)
+test_recall = recall_score(y_test, test_pred, average="weighted")
 print(f"Test Accuracy: {test_accuracy:.4f}")
+print(f"Test Precision: {test_precision:.4f}")
+print(f"Test Recall: {test_recall:.4f}")
+print(f"Test F1 Score: {test_f1:.4f}")
 
 # Confusion matrix
 cm = confusion_matrix(y_test, test_pred, labels=["team1_win", "team2_win", "draw"])
@@ -206,4 +213,33 @@ disp.plot(cmap="Blues", values_format="d")
 plt.title(f"KNN Confusion Matrix (Test Set, K={best_k})")
 plt.tight_layout()
 plt.savefig("visuals/knn_confusion_matrix.png")
+plt.close()
+
+# ============================================================
+# 6. LOGISTIC REGRESSION MODEL
+# ============================================================
+
+# Train logistic regression using same train/test split as KNN
+lr_model = LogisticRegression()
+lr_model.fit(X_train, y_train)
+
+# Evaluate on test set
+test_pred_lr = lr_model.predict(X_test)
+test_acc = accuracy_score(y_test, test_pred_lr)
+test_precision = precision_score(y_test, test_pred_lr, average="weighted", zero_division=0)
+test_recall = recall_score(y_test, test_pred_lr, average="weighted")
+test_f1 = f1_score(y_test, test_pred_lr, average="weighted")
+print(f"\nTest Accuracy: {test_acc:.4f}")
+print(f"Test Precision: {test_precision:.4f}")
+print(f"Test Recall: {test_recall:.4f}")
+print(f"Test F1 Score: {test_f1:.4f}")
+
+# Confusion matrix
+cm_lr = confusion_matrix(y_test, test_pred_lr, labels=["team1_win", "team2_win", "draw"])
+disp_lr = ConfusionMatrixDisplay(confusion_matrix=cm_lr,
+                                  display_labels=["team1_win", "team2_win", "draw"])
+disp_lr.plot(cmap="Blues", values_format="d")
+plt.title("Logistic Regression Confusion Matrix (Test Set)")
+plt.tight_layout()
+plt.savefig("visuals/lr_confusion_matrix.png")
 plt.close()
