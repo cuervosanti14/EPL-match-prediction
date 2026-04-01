@@ -128,3 +128,37 @@ print(f"P-value: {p_value:.6f}")
 
 print("\nSeason summary with COVID flag:")
 print(season_summary)
+
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+from sklearn.model_selection import train_test_split
+
+# -----------------------------
+# Step 6: Binary Logistic Regression
+# Predict whether the home team wins
+# -----------------------------
+binary_data = matches[["HTHG", "HTAG", "FTR"]].dropna().copy()
+binary_data["HomeWin"] = (binary_data["FTR"] == "H").astype(int)
+
+X = binary_data[["HTHG", "HTAG"]]
+y = binary_data["HomeWin"]
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42, stratify=y
+)
+
+log_model = LogisticRegression(max_iter=1000)
+log_model.fit(X_train, y_train)
+
+y_pred = log_model.predict(X_test)
+
+accuracy = accuracy_score(y_test, y_pred)
+
+print("\nBinary Logistic Regression Results (Home Win vs Not Home Win):")
+print(f"Accuracy: {accuracy:.4f}")
+
+print("\nClassification Report:")
+print(classification_report(y_test, y_pred))
+
+print("\nConfusion Matrix:")
+print(confusion_matrix(y_test, y_pred))
