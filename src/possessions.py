@@ -1,6 +1,9 @@
 from pathlib import Path
 import pandas as pd
 import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
 
 
 SEASONS = [
@@ -32,19 +35,52 @@ def assign_points_group(points):
         return "Outside range"
 
 
+def read_standard_table(path):
+    """
+    Read the squad standard stats table.
+    FBref standard tables usually need header=1 because of grouped headers.
+    """
+    return pd.read_csv(path, header=1)
+
+
+def read_points_table(path):
+    """
+    Read the league table and handle files with or without headers.
+    """
+    df = pd.read_csv(path)
+
+    # Normal case: file already has headers
+    if "Squad" in df.columns and "Pts" in df.columns:
+        return df
+
+    # Fallback: file was saved without headers
+    df = pd.read_csv(path, header=None)
+
+    expected_cols = [
+        "Rk", "Squad", "MP", "W", "D", "L", "GF", "GA",
+        "GD", "Pts", "Pts/MP", "Attendance",
+        "Top Team Scorer", "Goalkeeper", "Notes"
+    ]
+
+    if df.shape[1] >= len(expected_cols):
+        df = df.iloc[:, :len(expected_cols)].copy()
+        df.columns = expected_cols
+
+    return df
+
+
 def load_one_season(season):
     """Load one season's standard stats and points tables, then merge them."""
     base_dir = Path(__file__).resolve().parents[1]
     standard_path = base_dir / "data" / "possession" / f"{season}_standard.csv"
     points_path = base_dir / "data" / "possession" / f"{season}_points.csv"
 
-    std_df = pd.read_csv(standard_path, header=1)
-    pts_df = pd.read_csv(points_path)
+    std_df = read_standard_table(standard_path)
+    pts_df = read_points_table(points_path)
 
     print(f"\nLoading season: {season}")
     print("STANDARD COLUMNS:")
     print(std_df.columns.tolist())
-
     print("\nPOINTS COLUMNS:")
     print(pts_df.columns.tolist())
 
@@ -61,6 +97,9 @@ def load_one_season(season):
 
     std_df = std_df[["team", "possession", "goals"]].copy()
     pts_df = pts_df[["team", "points"]].copy()
+
+    std_df["team"] = std_df["team"].astype(str).str.strip()
+    pts_df["team"] = pts_df["team"].astype(str).str.strip()
 
     std_df["possession"] = (
         std_df["possession"]
@@ -80,6 +119,17 @@ def load_one_season(season):
     df = df.dropna(subset=["team", "possession", "goals", "points"]).copy()
 
     return df
+
+
+def load_all_seasons():
+    """Load and combine all seasons."""
+    frames = []
+
+    for season in SEASONS:
+        season_df = load_one_season(season)
+        frames.append(season_df)
+
+    return pd.concat(frames, ignore_index=True)
 
 
 def descriptive_stats_by_points_group(df):
@@ -134,14 +184,50 @@ def plot_scatter_possession_vs_goals(df):
     plt.show()
 
 
+def run_logistic_regression_50_points(df):
+    """
+    Logistic regression:
+    1 = team earned 50 or more points
+    0 = team earned 49 or fewer points
+    """
+    df = df.copy()
+    df["high_points"] = (df["points"] >= 50).astype(int)
+
+    X = df[["possession"]]
+    y = df["high_points"]
+
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.20, random_state=2500, stratify=y
+    )
+
+    model = LogisticRegression()
+    model.fit(X_train, y_train)
+
+    y_pred = model.predict(X_test)
+
+    acc = accuracy_score(y_test, y_pred)
+    cm = confusion_matrix(y_test, y_pred)
+
+    print("\n=== Logistic Regression: 50+ Points ===")
+    print("Coefficient for possession:", model.coef_[0][0])
+    print("Intercept:", model.intercept_[0])
+
+    print("\nAccuracy Score:")
+    print(round(acc, 4))
+
+    print("\nConfusion Matrix:")
+    print(cm)
+    print("Rows = actual class [0, 1]")
+    print("Columns = predicted class [0, 1]")
+
+    print("\nClassification Report:")
+    print(classification_report(y_test, y_pred))
+
+    return model, acc, cm
+
+
 def main():
-    frames = []
-
-    for season in SEASONS:
-        season_df = load_one_season(season)
-        frames.append(season_df)
-
-    df = pd.concat(frames, ignore_index=True)
+    df = load_all_seasons()
 
     print("\nMerged data:")
     print(df.head())
@@ -155,6 +241,8 @@ def main():
     plot_boxplot_possession_by_points_group(df)
     plot_mean_possession_by_points_group(df)
     plot_scatter_possession_vs_goals(df)
+
+    run_logistic_regression_50_points(df)
 
     df.to_csv("epl_possession_points_goals_2016_2017_to_2024_2025.csv", index=False)
     print("\nSaved dataset to epl_possession_points_goals_2016_2017_to_2024_2025.csv")
