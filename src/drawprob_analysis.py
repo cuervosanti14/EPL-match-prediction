@@ -26,8 +26,6 @@ def load_and_clean_data(filepath):
         "prob1",
         "probtie",
         "prob2",
-        "proj_score1",
-        "proj_score2",
         "score1",
         "score2"
     ]]

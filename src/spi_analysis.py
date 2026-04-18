@@ -98,7 +98,7 @@ plt.xlabel("SPI Gap Bin")
 plt.ylabel("Win Rate")
 plt.xticks(rotation=0)
 plt.tight_layout()
-plt.savefig("visuals//SPI/win_rate_by_spi_bin.png")
+plt.savefig("visuals/SPI/win_rate_by_spi_bin.png")
 plt.close()
 
 # --- Visualization 2: SPI gap vs predicted win probability (prob1) ---
