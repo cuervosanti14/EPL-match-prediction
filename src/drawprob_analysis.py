@@ -137,7 +137,8 @@ def plot_draw_rate_by_season(matches):
     plt.ylim(0, max(draw_by_season.values) + 0.05)
     plt.grid(True, alpha=0.3)
     plt.tight_layout()
-    plt.show()
+    plt.savefig("visuals/draw_prob/draw_rate_by_season.png")
+    plt.close()
 
     return draw_by_season
 
@@ -165,7 +166,8 @@ def plot_draw_rate_by_spi_gap(matches):
     plt.ylim(0, max(draw_rates_by_gap.values) + 0.05)
     plt.grid(axis="y", alpha=0.3)
     plt.tight_layout()
-    plt.show()
+    plt.savefig("visuals/draw_prob/draw_rate_by_spi_gap.png")
+    plt.close()
 
     return draw_rates_by_gap
 
@@ -214,15 +216,18 @@ def plot_predicted_vs_actual_draw(matches):
     plt.ylabel("Actual Draw Frequency")
     plt.grid(True, alpha=0.3)
     plt.tight_layout()
-    plt.show()
+    plt.savefig("visuals/draw_prob/predicted_vs_actual_draw.png")
+    plt.close()
 
     return draw_prob_compare
 
 
 def main():
-    matches = load_and_clean_data("../data/spi_matches.csv")
+    matches = load_and_clean_data("data/SPI/spi_matches.csv")
+    
+    matches.head(1000).to_csv("data/draw_prob/spi_matches_reduced.csv", index=False)
 
-    matches.to_csv("../data/premier_league_matches_cleaned.csv", index=False)
+    matches.to_csv("data/draw_prob/premier_league_matches_cleaned.csv", index=False)
 
     print("First 5 rows:")
     print(matches.head())
@@ -302,7 +307,6 @@ def main():
     print()
 
     print("EDA and KNN modeling complete.")
-
 
 if __name__ == "__main__":
     main()

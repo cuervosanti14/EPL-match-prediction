@@ -3,11 +3,14 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import pandas as pd
 from scipy.stats import chisquare
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix, ConfusionMatrixDisplay
+from sklearn.model_selection import train_test_split
 
 # -----------------------------
 # Step 1: Load and combine all CSV files
 # -----------------------------
-data_folder = Path(__file__).resolve().parent.parent / "data"
+data_folder = Path(__file__).resolve().parent.parent / "data" / "home_advantage"
 files = sorted(data_folder.glob("epl_*.csv"))
 
 print("Files found:")
@@ -93,7 +96,8 @@ plt.ylabel("Rate")
 plt.xticks(rotation=45)
 plt.legend()
 plt.tight_layout()
-plt.show()
+plt.savefig("visuals/home_advantage/home_advantage_seasonal_trend.png")
+plt.close()
 
 # -----------------------------
 # Step 4: Overall bar plot
@@ -110,7 +114,8 @@ plt.xlabel("Result Type")
 plt.ylabel("Proportion")
 plt.xticks(rotation=0)
 plt.tight_layout()
-plt.show()
+plt.savefig("visuals/home_advantage/home_advantage_overall_distribution.png")
+plt.close()
 
 # -----------------------------
 # Step 5: Chi-square test
@@ -128,10 +133,6 @@ print(f"P-value: {p_value:.6f}")
 
 print("\nSeason summary with COVID flag:")
 print(season_summary)
-
-from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
-from sklearn.model_selection import train_test_split
 
 # -----------------------------
 # Step 6: Binary Logistic Regression
@@ -160,5 +161,11 @@ print(f"Accuracy: {accuracy:.4f}")
 print("\nClassification Report:")
 print(classification_report(y_test, y_pred))
 
-print("\nConfusion Matrix:")
-print(confusion_matrix(y_test, y_pred))
+cm = confusion_matrix(y_test, y_pred)
+disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=["Not Home Win", "Home Win"])
+
+disp.plot(cmap="Blues", values_format="d")
+plt.title("Logistic Regression Confusion Matrix (Home Win Prediction)")
+plt.tight_layout()
+plt.savefig("visuals/home_advantage/home_advantage_confusion_matrix.png")
+plt.close()

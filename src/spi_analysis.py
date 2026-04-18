@@ -12,7 +12,7 @@ from sklearn.linear_model import LogisticRegression
 # ============================================================
 
 # Load raw SPI dataset
-df = pd.read_csv("data/spi_matches.csv")
+df = pd.read_csv("data/SPI/spi_matches.csv")
 
 # Filter to English Premier League only
 df = df[df["league"] == "Barclays Premier League"]
@@ -98,7 +98,7 @@ plt.xlabel("SPI Gap Bin")
 plt.ylabel("Win Rate")
 plt.xticks(rotation=0)
 plt.tight_layout()
-plt.savefig("visuals/win_rate_by_spi_bin.png")
+plt.savefig("visuals//SPI/win_rate_by_spi_bin.png")
 plt.close()
 
 # --- Visualization 2: SPI gap vs predicted win probability (prob1) ---
@@ -123,7 +123,7 @@ legend = [
 
 plt.legend(handles=legend, title="Actual Result")
 plt.tight_layout()
-plt.savefig("visuals/spi_gap_vs_prob1.png")
+plt.savefig("visuals/SPI/spi_gap_vs_prob1.png")
 plt.close()
 
 # --- Visualization 3: SPI gap distribution by actual result ---
@@ -135,7 +135,7 @@ plt.suptitle("")
 plt.xlabel("Actual Result")
 plt.ylabel("SPI Differential")
 plt.tight_layout()
-plt.savefig("visuals/spi_gap_by_result.png")
+plt.savefig("visuals/SPI/spi_gap_by_result.png")
 plt.close()
 
 print("All visualizations saved to visuals/ folder.")
@@ -183,7 +183,7 @@ plt.title("Validation Accuracy vs. K")
 plt.xlabel("K (Number of Neighbors)")
 plt.ylabel("Accuracy")
 plt.tight_layout()
-plt.savefig("visuals/knn_validation_accuracy.png")
+plt.savefig("visuals/SPI/knn_validation_accuracy.png")
 plt.close()
 
 best_k = k_values[val_accuracies.index(max(val_accuracies))]
@@ -212,7 +212,7 @@ disp = ConfusionMatrixDisplay(confusion_matrix=cm,
 disp.plot(cmap="Blues", values_format="d")
 plt.title(f"KNN Confusion Matrix (Test Set, K={best_k})")
 plt.tight_layout()
-plt.savefig("visuals/knn_confusion_matrix.png")
+plt.savefig("visuals/SPI/knn_confusion_matrix.png")
 plt.close()
 
 # ============================================================
@@ -241,7 +241,7 @@ disp_lr = ConfusionMatrixDisplay(confusion_matrix=cm_lr,
 disp_lr.plot(cmap="Blues", values_format="d")
 plt.title("Logistic Regression Confusion Matrix (Test Set)")
 plt.tight_layout()
-plt.savefig("visuals/lr_confusion_matrix.png")
+plt.savefig("visuals/SPI/lr_confusion_matrix.png")
 plt.close()
 
 # ============================================================
@@ -276,3 +276,5 @@ print(f"{'Naive Baseline':<25} {'0.4501':>10} {'-':>10} {'-':>10} {'-':>10}")
 print(f"{'KNN (K=20)':<25} {knn_accuracy:>10.4f} {knn_precision:>10.4f} {knn_recall:>10.4f} {knn_f1:>10.4f}")
 print(f"{'Logistic Regression':<25} {lr_accuracy:>10.4f} {lr_precision:>10.4f} {lr_recall:>10.4f} {lr_f1:>10.4f}")
 print(f"{'SPI':<25} {spi_dataset_acc:>10.4f} {spi_dataset_precision:>10.4f} {spi_dataset_recall:>10.4f} {spi_dataset_f1:>10.4f}")
+
+df.head(1000).to_csv("data/SPI/spi_matches_reduced.csv", index=False)

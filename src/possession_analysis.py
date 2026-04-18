@@ -3,8 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
-
+from sklearn.metrics import accuracy_score, confusion_matrix, classification_report, ConfusionMatrixDisplay
 
 SEASONS = [
     "2024-2025",
@@ -78,12 +77,6 @@ def load_one_season(season):
     std_df = read_standard_table(standard_path)
     pts_df = read_points_table(points_path)
 
-    print(f"\nLoading season: {season}")
-    print("STANDARD COLUMNS:")
-    print(std_df.columns.tolist())
-    print("\nPOINTS COLUMNS:")
-    print(pts_df.columns.tolist())
-
     std_df = std_df.rename(columns={
         "Squad": "team",
         "Poss": "possession",
@@ -152,8 +145,8 @@ def plot_boxplot_possession_by_points_group(df):
     plt.xlabel("Final Points Group")
     plt.ylabel("Average Possession (%)")
     plt.tight_layout()
-    plt.show()
-
+    plt.savefig("visuals/possession/boxplot_possession_by_points_group.png")
+    plt.close()
 
 def plot_mean_possession_by_points_group(df):
     """Bar chart of mean possession by final points group."""
@@ -170,7 +163,8 @@ def plot_mean_possession_by_points_group(df):
     plt.xlabel("Final Points Group")
     plt.ylabel("Mean Possession (%)")
     plt.tight_layout()
-    plt.show()
+    plt.savefig("visuals/possession/mean_possession_by_points_group.png")
+    plt.close()
 
 
 def plot_scatter_possession_vs_goals(df):
@@ -181,7 +175,8 @@ def plot_scatter_possession_vs_goals(df):
     plt.xlabel("Average Possession (%)")
     plt.ylabel("Goals Scored")
     plt.tight_layout()
-    plt.show()
+    plt.savefig("visuals/possession/scatter_possession_vs_goals.png")
+    plt.close()
 
 
 def run_logistic_regression_50_points(df):
@@ -223,6 +218,13 @@ def run_logistic_regression_50_points(df):
     print("\nClassification Report:")
     print(classification_report(y_test, y_pred))
 
+    disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=["Below 50 pts", "50+ pts"])
+    disp.plot(cmap="Blues", values_format="d")
+    plt.title("Logistic Regression Confusion Matrix (50+ Points)")
+    plt.tight_layout()
+    plt.savefig("visuals/possession/lr_confusion_matrix.png")
+    plt.close()
+
     return model, acc, cm
 
 
@@ -244,8 +246,8 @@ def main():
 
     run_logistic_regression_50_points(df)
 
-    df.to_csv("epl_possession_points_goals_2016_2017_to_2024_2025.csv", index=False)
-    print("\nSaved dataset to epl_possession_points_goals_2016_2017_to_2024_2025.csv")
+    df.to_csv("data/possession/epl_possession_points_goals_2016_2017_to_2024_2025.csv", index=False)
+    print("\nSaved dataset to data/possession/epl_possession_points_goals_2016_2017_to_2024_2025.csv")
 
 
 if __name__ == "__main__":
