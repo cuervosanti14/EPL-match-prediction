@@ -12,10 +12,6 @@ This project investigates how well publicly available statistics
 predict EPL match outcomes (Win, Draw, Loss) across four
 distinct analytical angles.
 
-## Setup
-Clone the repo and install libraries:
-pip install -r requirements.txt
-
 ## Data Sources
 - Football Data UK: https://football-data.co.uk/
 - FBref: https://fbref.com/en/
