@@ -53,15 +53,15 @@ pip install -r requirements.txt
    - Organized by analysis type (SPI, draw_prob, home_advantage, possession)
 
 ## Project Structure
-`
+```
 EPL-match-prediction/
 ├── README.md
-├── data/ (datasets - CSV files)
+├── data/
 │   ├── SPI/
 │   ├── draw_prob/
 │   ├── home_advantage/
 │   └── possession/
-├── src/ (analyses)
+├── src/
 │   ├── spi_analysis.py
 │   ├── drawprob_analysis.py
 │   ├── home_advantage_analysis.py
@@ -73,4 +73,4 @@ EPL-match-prediction/
 │   └── possession/
 ├── requirements.txt
 └── .gitignore
-`
+```
