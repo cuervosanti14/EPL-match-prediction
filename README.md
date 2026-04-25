@@ -72,5 +72,4 @@ EPL-match-prediction/
 │   ├── home_advantage/
 │   └── possession/
 ├── requirements.txt
-└── .gitignore
 ```
